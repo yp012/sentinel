@@ -1,0 +1,4 @@
+# Usage: bandit -c bandit.yaml -r .
+exclude_dirs:
+  - tests
+  - .venv
