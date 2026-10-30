@@ -151,6 +151,34 @@ class Settings:
     # Live log following.
     tail_poll_interval_s: float = field(
         default_factory=lambda: _env_float("SENTINEL_TAIL_POLL_INTERVAL_S", 0.25))
+    # Comma-separated log files the engine follows on startup. Empty = no tailing.
+    log_paths: tuple[str, ...] = field(
+        default_factory=lambda: _env_list("LOG_PATHS", ""))
+    # Read followed files from the beginning instead of only new lines.
+    tail_from_start: bool = field(
+        default_factory=lambda: _env_bool("SENTINEL_TAIL_FROM_START", False))
+
+    # Incident store. Empty path = in-memory only (no SQLite persistence).
+    db_path: str = field(
+        default_factory=lambda: _env_str("SENTINEL_DB_PATH", ""))
+    # Incidents kept in memory; the oldest are evicted first (SQLite keeps them all).
+    store_max_incidents: int = field(
+        default_factory=lambda: _env_int("SENTINEL_STORE_MAX_INCIDENTS", 10_000))
+    # Events/sec series: bucket width and number of buckets kept.
+    metrics_bucket_s: float = field(
+        default_factory=lambda: _env_float("SENTINEL_METRICS_BUCKET_S", 1.0))
+    metrics_buckets: int = field(
+        default_factory=lambda: _env_int("SENTINEL_METRICS_BUCKETS", 300))
+
+    # HTTP API. Empty key = no authentication.
+    api_key: str = field(
+        default_factory=lambda: _env_str("SENTINEL_API_KEY", ""), repr=False)
+    api_max_body_bytes: int = field(
+        default_factory=lambda: _env_int("SENTINEL_API_MAX_BODY_BYTES", 1_048_576))
+    ingest_max_lines: int = field(
+        default_factory=lambda: _env_int("SENTINEL_INGEST_MAX_LINES", 5000))
+    ingest_max_line_chars: int = field(
+        default_factory=lambda: _env_int("SENTINEL_INGEST_MAX_LINE_CHARS", 16_384))
 
     @property
     def firewall_state_file(self) -> str:
