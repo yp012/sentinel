@@ -7,6 +7,7 @@ through safety-guarded SOAR playbooks.**
 **Status:** core detection + SOAR engine complete; API, dashboard, Docker cyber range and
 benchmarks in progress.
 
+[![CI](https://github.com/yp012/sentinel/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yp012/sentinel/actions/workflows/ci.yml)
 [![Python 3.10–3.12](https://img.shields.io/badge/python-3.10%E2%80%933.12-3776AB?logo=python&logoColor=white)](#quickstart-what-works-today)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-T1110%20%C2%B7%20T1190%20%C2%B7%20T1078-red)](#detection-coverage)
