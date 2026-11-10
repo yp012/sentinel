@@ -1,0 +1,26 @@
+# Keep the build context small and free of secrets / local state.
+.git
+.github
+.venv
+venv
+data/
+tests/
+docs/
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+.coverage.*
+htmlcov
+benchmark_results
+.env
+.env.*
+.streamlit/secrets.toml
+*.db
+*.log
+*.jsonl
+.DS_Store
+.idea
+.vscode

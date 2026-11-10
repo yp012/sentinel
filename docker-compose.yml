@@ -1,0 +1,73 @@
+# SentinelSOAR cyber range: engine + SOC dashboard + attack simulator.
+# Secrets come from the environment / .env (see .env.example); nothing is baked into images.
+# Ports bind to 127.0.0.1 only: the API and dashboard are for the local analyst.
+
+x-hardening: &hardening
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  tmpfs:
+    - /tmp:size=64m,mode=1777
+
+services:
+  sentinel-engine:
+    build:
+      context: .
+      dockerfile: docker/engine.Dockerfile
+    image: sentinel-engine:local
+    <<: *hardening
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      # incidents.db, firewall_rules.json, firewall_commands.log, webhook_outbox.jsonl
+      - ./data:/data
+    environment:
+      ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY:-}   # empty = deterministic mock intel
+      WEBHOOK_URL: ${WEBHOOK_URL:-}               # empty = write to /data outbox
+      SENTINEL_API_KEY: ${SENTINEL_API_KEY:-}     # empty = no API auth
+      # Simulated firewall only: real iptables would need root + NET_ADMIN.
+      SENTINEL_REAL_FIREWALL: "0"
+    networks: [cyber-range]
+
+  sentinel-dashboard:
+    build:
+      context: .
+      dockerfile: docker/dashboard.Dockerfile
+    image: sentinel-dashboard:local
+    <<: *hardening
+    restart: unless-stopped
+    depends_on:
+      sentinel-engine:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8501:8501"
+    environment:
+      ENGINE_URL: http://sentinel-engine:8000
+      SENTINEL_API_KEY: ${SENTINEL_API_KEY:-}
+    networks: [cyber-range]
+
+  attack-simulator:
+    build:
+      context: .
+      dockerfile: docker/simulator.Dockerfile
+    image: sentinel-simulator:local
+    <<: *hardening
+    # Bounded so a bad SIM_* value doesn't crash-loop forever; engine outages are
+    # handled inside the simulator (it waits on /health and retries).
+    restart: on-failure:5
+    depends_on:
+      sentinel-engine:
+        condition: service_healthy
+    environment:
+      ENGINE_URL: http://sentinel-engine:8000
+      SIM_SEED: ${SIM_SEED:-1337}
+      SIM_RATE: ${SIM_RATE:-20}
+      SIM_ATTACK_RATIO: ${SIM_ATTACK_RATIO:-0.1}
+      SENTINEL_API_KEY: ${SENTINEL_API_KEY:-}
+    networks: [cyber-range]
+
+networks:
+  cyber-range:
+    name: cyber-range
+    driver: bridge

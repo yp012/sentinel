@@ -1,0 +1,5 @@
+# Engine image (sentinel/ only). Plain uvicorn: the [standard] extras aren't needed in the container.
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2.6,<3
+requests>=2.31
