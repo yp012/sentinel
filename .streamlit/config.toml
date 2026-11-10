@@ -1,0 +1,15 @@
+# Read by `streamlit run` from the repo root (and the dashboard image's workdir).
+[theme]
+base = "dark"
+primaryColor = "#3987e5"
+backgroundColor = "#0b0f17"
+secondaryBackgroundColor = "#121826"
+textColor = "#d7dde8"
+
+[client]
+# Never show Python tracebacks in the browser.
+showErrorDetails = "none"
+toolbarMode = "viewer"
+
+[browser]
+gatherUsageStats = false
